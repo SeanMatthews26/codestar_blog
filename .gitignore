@@ -1,2 +1,11 @@
+core.Microssoft*
+core.mongo*
+core.python*
 .venv
 env.py
+__pycache__/
+*.py[cod]
+node_modules/
+.github/
+cloudinary_pythin.txt
+blog/fixtures/

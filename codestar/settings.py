@@ -12,7 +12,15 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
+
+# dj_database_url is optional for local development. If it's not installed
+# we fall back to a local sqlite database so settings.py doesn't crash
+# with ModuleNotFoundError. Install the dependency with:
+#   pip install -r requirements.txt
+try:
+    import dj_database_url
+except ImportError:
+    dj_database_url = None
 if os.path.isfile('env.py'):
     import env
 
@@ -86,9 +94,19 @@ WSGI_APPLICATION = 'codestar.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
-}
+if dj_database_url and os.environ.get("DATABASE_URL"):
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+    }
+else:
+    # Default to a local sqlite database for development when DATABASE_URL
+    # isn't provided or dj_database_url isn't installed.
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.codeinstitute-ide.net/",
